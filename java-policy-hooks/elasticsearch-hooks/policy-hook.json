@@ -1,0 +1,16 @@
+/* This file is the descriptor for the java policy hooks elasticsearch-hooks */
+{
+    "meta" : {
+        // label: name of the policy as displayed, should be short
+        "label": "Custom policy hooks elasticsearch-hooks",
+
+        // description: longer string to help end users understand what this policy is
+        "description": "",
+
+        // icon: must be one of the FontAwesome 3.2.1 icons, complete list here at https://fontawesome.com/v3.2.1/icons/
+        "icon": "icon-puzzle-piece"
+    },
+
+    /* name of the class implementing the policy hooks */
+    "hooksClass": "com.dataiku.dip.plugins.elasticsearch_utils.elasticsearch_hooks"
+}

@@ -9,6 +9,10 @@ on:
   pull_request:
     branches: [ "master" ]
 
+
+env:
+  DSS_VERSION: 11.3.1
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,9 +24,9 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
     - name: Build with Ant
-      run: | 
-        wget -q https://downloads.dataiku.com/public/studio/11.3.1/dataiku-dss-11.3.1.tar.gz
-        tar -zxvf dataiku-dss-11.3.1.tar.gz  dataiku-dss-11.2.1/dist
-        tar -zxvf dataiku-dss-11.3.1.tar.gz  dataiku-dss-11.2.1/lib
-        export DKUINSTALLDIR=$(pwd)/dataiku-dss-11.3.1
+      run: |
+        wget -q https://downloads.dataiku.com/public/studio/$DSS_VERSION/dataiku-dss-$DSS_VERSION.tar.gz
+        tar -zxvf dataiku-dss-$DSS_VERSION.tar.gz  dataiku-dss-$DSS_VERSION/dist
+        tar -zxvf dataiku-dss-$DSS_VERSION.tar.gz  dataiku-dss-$DSS_VERSION/lib
+        export DKUINSTALLDIR=$(pwd)/dataiku-dss-$DSS_VERSION
         ant -noinput -buildfile build.xml

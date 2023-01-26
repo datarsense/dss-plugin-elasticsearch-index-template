@@ -30,3 +30,9 @@ jobs:
         tar -zxf dataiku-dss-$DSS_VERSION.tar.gz  dataiku-dss-$DSS_VERSION/lib
         export DKUINSTALLDIR=$(pwd)/dataiku-dss-$DSS_VERSION
         ant -noinput -buildfile build.xml
+    - name: 'Upload Artifact'
+      uses: actions/upload-artifact@v3
+      with:
+        name: dss-plugin-elasticsearch-index-template
+        path: java-lib/dss-plugin-elasticsearch-index-template.jar
+        retention-days: 5

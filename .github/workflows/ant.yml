@@ -20,4 +20,9 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
     - name: Build with Ant
-      run: ant -noinput -buildfile build.xml
+      run: | 
+        wget https://downloads.dataiku.com/public/studio/11.3.1/dataiku-dss-11.3.1.tar.gz
+        tar -zxvf dataiku-dss-11.2.1.tar.gz  dataiku-dss-11.2.1/dist
+        tar -zxvf dataiku-dss-11.2.1.tar.gz  dataiku-dss-11.2.1/lib
+        export DKUINSTALLDIR=$(pwd)/dataiku-dss-11.2.1
+        ant -noinput -buildfile build.xml

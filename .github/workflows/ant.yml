@@ -26,7 +26,7 @@ jobs:
     - name: Build with Ant
       run: |
         wget -q https://downloads.dataiku.com/public/studio/$DSS_VERSION/dataiku-dss-$DSS_VERSION.tar.gz
-        tar -zxvf dataiku-dss-$DSS_VERSION.tar.gz  dataiku-dss-$DSS_VERSION/dist
-        tar -zxvf dataiku-dss-$DSS_VERSION.tar.gz  dataiku-dss-$DSS_VERSION/lib
+        tar -zxf dataiku-dss-$DSS_VERSION.tar.gz  dataiku-dss-$DSS_VERSION/dist
+        tar -zxf dataiku-dss-$DSS_VERSION.tar.gz  dataiku-dss-$DSS_VERSION/lib
         export DKUINSTALLDIR=$(pwd)/dataiku-dss-$DSS_VERSION
         ant -noinput -buildfile build.xml

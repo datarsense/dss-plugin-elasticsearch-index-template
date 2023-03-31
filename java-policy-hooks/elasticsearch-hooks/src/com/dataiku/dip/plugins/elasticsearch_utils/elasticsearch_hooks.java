@@ -18,6 +18,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import org.json.JSONObject;
 
 
@@ -48,14 +49,24 @@ public class elasticsearch_hooks extends CustomPolicyHooks {
                 
                 JSONObject inferedDatasetEsMappingProperties = ElasticSearchUtils.getDefaultMappingDefinition(Dataset.fromSerialized(ds), ElasticSearchDialect.ES_7).getJSONObject("properties");
                 
+                String customMappingProperties = ds.getParamsAs(ElasticSearchDatasetHandler.Config.class).customMapping;
+                JSONObject customMappingPropertiesObj = null;
+                if(customMappingProperties != null && !customMappingProperties.trim().isEmpty() && isValidElasticsearchMapping(customMappingProperties)) {
+                    customMappingPropertiesObj = new JSONObject(customMappingProperties);
+                }
+
+                // Use custom mapping if it exists to allow field type mapping customization for ES type not implemented in DSS 
+                JSONObject sourceMappingProperties = (customMappingPropertiesObj != null ) ? customMappingPropertiesObj : inferedDatasetEsMappingProperties;
+
+
                 // A custom ES mapping will only be required if the dataset contains columns mapped in an index template.
                 boolean customEsMappingRequired = false;
 
                 // For each column defined in the index template test if dataset schema contains it,
                 // remove it from the dataset ES index mapping, and flag custom ES mapping as required.
                 for (String col : columnsList) {
-                    if(inferedDatasetEsMappingProperties.has(col)) {
-                        inferedDatasetEsMappingProperties.remove(col);
+                    if(sourceMappingProperties.has(col)) {
+                        sourceMappingProperties.remove(col);
                         customEsMappingRequired = true;
                     }
                 }  
@@ -63,7 +74,7 @@ public class elasticsearch_hooks extends CustomPolicyHooks {
                 // Build the custom Elasticsearch JSON mapping if required and write it to the Elasticsearch connection parameters of the dataset
                 if (customEsMappingRequired) {
                     JSONObject customDatasetEsMapping = new JSONObject();
-                    customDatasetEsMapping.put("properties", inferedDatasetEsMappingProperties);
+                    customDatasetEsMapping.put("properties", sourceMappingProperties);
                     ds.getParamsAs(ElasticSearchDatasetHandler.Config.class).customMapping = customDatasetEsMapping.toString(0);
                     logger.info((Object)("Configuring custom elasticsearch mapping " + ((ElasticSearchDatasetHandler.Config)ds.getParams()).customMapping) + " for dataset " + ds.name);
                 }
@@ -73,6 +84,14 @@ public class elasticsearch_hooks extends CustomPolicyHooks {
     
     private boolean isElasticSearchDataset(SerializedDataset ds) {
         return ds.type.equals("ElasticSearch");
+    }
+
+    private boolean isValidElasticsearchMapping(String json) {
+        try {
+            return JsonParser.parseString(json).isJsonObject();
+        } catch (JsonSyntaxException e) {
+            return false;
+        }
     }
 
     @Override

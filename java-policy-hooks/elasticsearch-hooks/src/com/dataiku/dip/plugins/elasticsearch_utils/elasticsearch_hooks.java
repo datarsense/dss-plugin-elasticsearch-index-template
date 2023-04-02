@@ -47,16 +47,16 @@ public class elasticsearch_hooks extends CustomPolicyHooks {
             // If the list contains at least one column name check if dataset schema contains columns mapped in the ES index template
             if (connections.contains(dsConnectionElt.getAsJsonPrimitive()) && columnsList.length > 0) {
                 
-                JSONObject inferedDatasetEsMappingProperties = ElasticSearchUtils.getDefaultMappingDefinition(Dataset.fromSerialized(ds), ElasticSearchDialect.ES_7).getJSONObject("properties");
+                JSONObject inferedDatasetEsMappingPropertiesObj = ElasticSearchUtils.getDefaultMappingDefinition(Dataset.fromSerialized(ds), ElasticSearchDialect.ES_7).getJSONObject("properties");
                 
                 String customMappingProperties = ds.getParamsAs(ElasticSearchDatasetHandler.Config.class).customMapping;
                 JSONObject customMappingPropertiesObj = null;
                 if(customMappingProperties != null && !customMappingProperties.trim().isEmpty() && isValidElasticsearchMapping(customMappingProperties)) {
-                    customMappingPropertiesObj = new JSONObject(customMappingProperties);
+                    customMappingPropertiesObj = (new JSONObject(customMappingProperties)).getJSONObject("properties");
                 }
 
                 // Use custom mapping if it exists to allow field type mapping customization for ES type not implemented in DSS 
-                JSONObject sourceMappingProperties = (customMappingPropertiesObj != null ) ? customMappingPropertiesObj : inferedDatasetEsMappingProperties;
+                JSONObject sourceMappingPropertiesObj = (customMappingPropertiesObj != null ) ? customMappingPropertiesObj : inferedDatasetEsMappingPropertiesObj;
 
 
                 // A custom ES mapping will only be required if the dataset contains columns mapped in an index template.
@@ -65,8 +65,8 @@ public class elasticsearch_hooks extends CustomPolicyHooks {
                 // For each column defined in the index template test if dataset schema contains it,
                 // remove it from the dataset ES index mapping, and flag custom ES mapping as required.
                 for (String col : columnsList) {
-                    if(sourceMappingProperties.has(col)) {
-                        sourceMappingProperties.remove(col);
+                    if(sourceMappingPropertiesObj.has(col)) {
+                        sourceMappingPropertiesObj.remove(col);
                         customEsMappingRequired = true;
                     }
                 }  
@@ -74,7 +74,7 @@ public class elasticsearch_hooks extends CustomPolicyHooks {
                 // Build the custom Elasticsearch JSON mapping if required and write it to the Elasticsearch connection parameters of the dataset
                 if (customEsMappingRequired) {
                     JSONObject customDatasetEsMapping = new JSONObject();
-                    customDatasetEsMapping.put("properties", sourceMappingProperties);
+                    customDatasetEsMapping.put("properties", sourceMappingPropertiesObj);
                     ds.getParamsAs(ElasticSearchDatasetHandler.Config.class).customMapping = customDatasetEsMapping.toString(0);
                     logger.info((Object)("Configuring custom elasticsearch mapping " + ((ElasticSearchDatasetHandler.Config)ds.getParams()).customMapping) + " for dataset " + ds.name);
                 }
@@ -88,7 +88,8 @@ public class elasticsearch_hooks extends CustomPolicyHooks {
 
     private boolean isValidElasticsearchMapping(String json) {
         try {
-            return JsonParser.parseString(json).isJsonObject();
+            JsonObject esMappingObj = JsonParser.parseString(json).getAsJsonObject();
+            return esMappingObj.has("properties");
         } catch (JsonSyntaxException e) {
             return false;
         }

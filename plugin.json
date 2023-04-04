@@ -10,7 +10,6 @@
         "url": "",
         "licenseInfo": "Apache Software License"
     },
-    
     "params": [
         {
             "name": "columns",
@@ -20,10 +19,17 @@
             "description": "Optional. Comma-separated list of column names defined in  elasticsearch index template conflicting with DSS column mapping."
         },
         {
-          "name": "es-connections",
-          "label": "Elasticsearch connections",
-          "type": "CONNECTIONS",
-          "description": "Optional. Elasticsearch connections containing an Elasticsearch index template."
+            "name": "es-connections",
+            "label": "Elasticsearch connections",
+            "type": "CONNECTIONS",
+            "description": "Optional. Elasticsearch connections containing an Elasticsearch index template."
+        },
+        {
+            "name": "customMappingAllowed",
+            "label": "Allow mapping customization",
+            "type": "BOOLEAN",
+            "defaultValue": false,
+            "description": "WARNING : Custom mapping will be overwritten at each schema change. Using an index template is the recommended way to configure field type mapping to ES types not implemented in DSS."
         }
     ]
 }

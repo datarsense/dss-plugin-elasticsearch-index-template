@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "meta": {
         "label": "Elasticsearch index template",
-        "description": "Plugin customizing Elasticsearch mappping for a DSS dataset to avoid mapping conflict when an index template is configured in the target Elasticsearch cluster.",
+        "description": "Plugin customizing Elasticsearch mapping for a DSS dataset to avoid mapping conflict when an index template is configured in the target Elasticsearch cluster.",
         "author": "admin",
         "icon": "icon-puzzle-piece",
         "tags": ["Elasticsearch"],
@@ -16,7 +16,7 @@
             "label": "Columns names",
             "type": "STRING",
             "mandatory": false,
-            "description": "Optional. Comma-separated list of column names defined in  elasticsearch index template conflicting with DSS column mapping."
+            "description": "Optional. Comma-separated list of column names defined in Elasticsearch index template conflicting with DSS column mapping."
         },
         {
             "name": "es-connections",

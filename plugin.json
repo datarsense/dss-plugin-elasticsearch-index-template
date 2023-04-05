@@ -12,19 +12,6 @@
     },
     "params": [
         {
-            "name": "columns",
-            "label": "Columns names",
-            "type": "STRING",
-            "mandatory": false,
-            "description": "Optional. Comma-separated list of column names defined in Elasticsearch index template conflicting with DSS column mapping."
-        },
-        {
-            "name": "es-connections",
-            "label": "Elasticsearch connections",
-            "type": "CONNECTIONS",
-            "description": "Optional. Elasticsearch connections containing an Elasticsearch index template."
-        },
-        {
             "name": "customMappingAllowed",
             "label": "Allow mapping customization",
             "type": "BOOLEAN",

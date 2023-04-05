@@ -25,7 +25,7 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
     
-    - name: Build with Ant and package
+    - name: Build with Ant
       run: |
         wget -q https://downloads.dataiku.com/public/studio/$DSS_VERSION/dataiku-dss-$DSS_VERSION.tar.gz
         tar -zxf dataiku-dss-$DSS_VERSION.tar.gz  dataiku-dss-$DSS_VERSION/dist
@@ -33,13 +33,17 @@ jobs:
         export DKUINSTALLDIR=$(pwd)/dataiku-dss-$DSS_VERSION
         ant -noinput -buildfile build.xml
         rm -Rf dataiku-dss* java-build/
-        zip -r dss-plugin-elasticsearch-index-template-$GITHUB_REF_NAME.zip ./ -x "*/.*" -x ".*"
     
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
         name: dss-plugin-elasticsearch-index-template
-        path: dss-plugin-elasticsearch-index-template-$GITHUB_REF_NAME.zip
+        path: ./
+    
+    - name: Package plugin before release
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        zip -r dss-plugin-elasticsearch-index-template-$GITHUB_REF_NAME.zip ./ -x "*/.*" -x ".*"
     
     - name: Create release and publish package
       uses: softprops/action-gh-release@v1

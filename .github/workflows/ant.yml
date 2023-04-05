@@ -52,4 +52,4 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: dss-plugin-elasticsearch-index-template-$GITHUB_REF_NAME.zip
+        files: dss-plugin-elasticsearch-index-template-*.zip

@@ -27,6 +27,7 @@ import com.google.gson.JsonParser;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -82,8 +83,12 @@ public class elasticsearch_hooks extends CustomPolicyHooks {
 
                 // Check if dataset schema has been changed
                 Schema afterSchema = ds.getSchema();
-                Schema beforeSchema = dsBefore.getSchema();
-                List<String> schemaDiff = SchemaComparator.findDifferences(beforeSchema, afterSchema, false);
+
+                List<String> schemaDiff = new ArrayList<>();
+                if (dsBefore != null) {
+                    Schema beforeSchema = dsBefore.getSchema();
+                    schemaDiff = SchemaComparator.findDifferences(beforeSchema, afterSchema, false);
+                }
                 
                 // Use custom mapping if it exists and if dataset schema has not been modified 
                 // to allow field type mapping customization for ES type not implemented in DSS

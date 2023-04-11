@@ -64,14 +64,24 @@ public class elasticsearch_hooks extends CustomPolicyHooks {
             SerializedDataset ds = (SerializedDataset)after;
             
             // Get a list of columns defined in an ES index template
+            Boolean allColumns = checkRemoveAllColumns(ds);
+            
             String[] columnsList = getColumnsListToRemove(ds);
             
             JsonObject pluginSettings = regularPluginsRegistryService.getSettings("elasticsearch-index-template").config;
             boolean hasCustomMappingAllowed = pluginSettings != null && pluginSettings.has("customMappingAllowed");
             Boolean customMappingAllowed = hasCustomMappingAllowed ? pluginSettings.get("customMappingAllowed").getAsBoolean() : null;
- 
-            // If the columnsList contains at least one column name, check if dataset schema contains columns mapped in the ES index template
-            if (columnsList.length > 0) {
+            
+            // If all columns are defined in an Elasticsearh index template, write an empty custom mapping
+            if (allColumns) {
+                JSONObject customDatasetEsMapping = new JSONObject();
+                customDatasetEsMapping.put("properties", new JSONObject());
+                ds.getParamsAs(ElasticSearchDatasetHandler.Config.class).customMapping = customDatasetEsMapping.toString(4);
+                logger.info((Object)("Configuring custom elasticsearch mapping " + ((ElasticSearchDatasetHandler.Config)ds.getParams()).customMapping) + " for dataset " + ds.name);
+
+            }
+            // Else if the columnsList contains at least one column name, check if dataset schema contains columns mapped in the ES index template
+            else if (columnsList.length > 0) {
                 // Get ES mappings configured for the dataset
                 JSONObject inferedDatasetEsMappingObj = ElasticSearchUtils.getDefaultMappingDefinition(Dataset.fromSerialized(ds), ElasticSearchDialect.ES_7);
                 
@@ -130,6 +140,34 @@ public class elasticsearch_hooks extends CustomPolicyHooks {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private Boolean checkRemoveAllColumns(SerializedDataset ds) throws CodedException,IOException {
+        JsonElement dsConnectionElt = JsonParser.parseString(ds.getParams().getConnection());
+        Boolean connectionFound = false;
+        Boolean result = false;
+        List<PluginPreset> presets = regularPluginsRegistryService.getSettings("elasticsearch-index-template").presets;
+
+        // Find if dataset connection has been defined in a plugin preset
+        // If yes, check if all columns have to be hidden
+        for (PluginPreset p : presets) {
+            if (p.pluginConfig.has("es-connections") && p.pluginConfig.has("allColumns")) {
+                JsonArray connections = p.pluginConfig.get("es-connections").getAsJsonArray(); 
+                logger.info((Object)("DEBUGCODE " + p.pluginConfig.toString()));
+
+                // Throw an error if ES connection if found in more than one preset
+                if(connectionFound && connections.contains(dsConnectionElt.getAsJsonPrimitive())) {
+                    throw new CodedException(mc, "Connection " + dsConnectionElt.getAsJsonPrimitive().getAsString() + " is defined in multiple elasticsearch-index-template plugin presets. Unable to define which preset has to be used. Please contact a DSS administrator.");
+                }
+
+                // Extract columns to hide for the first connection in presets matching ES connection name
+                if(!connectionFound && connections.contains(dsConnectionElt.getAsJsonPrimitive())) {
+                    connectionFound = true;
+                    result = p.pluginConfig.get("allColumns").getAsBoolean();
+                }
+            }
+        }
+        return result;
     }
 
     private String[] getColumnsListToRemove(SerializedDataset ds) throws CodedException,IOException {

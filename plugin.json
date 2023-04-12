@@ -1,6 +1,6 @@
 {
     "id": "elasticsearch-index-template",
-    "version": "0.0.1",
+    "version": "0.2.0",
     "meta": {
         "label": "Elasticsearch index template",
         "description": "Plugin customizing Elasticsearch mapping for a DSS dataset to avoid mapping conflict when an index template is configured in the target Elasticsearch cluster.",

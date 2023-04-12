@@ -11,11 +11,19 @@
 
     "pluginParams": [
         {
+            "name": "allColumns",
+            "label": "All columns",
+            "type": "BOOLEAN",
+            "defaultValue": false,
+            "description": "ALL columns mappings of ALL managed datasets created using the Elasticsearch connections are defined in an Elasticsearch index template."
+        },
+        {
             "name": "columns",
             "label": "Columns names",
             "type": "STRING",
             "mandatory": false,
-            "description": "Optional. Comma-separated list of column names defined in Elasticsearch index template conflicting with DSS column mapping."
+            "description": "Optional. Comma-separated list of column names defined in Elasticsearch index template conflicting with DSS column mapping.",
+            "visibilityCondition": "!model.allColumns"
         },
         {
             "name": "es-connections",

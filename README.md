@@ -20,6 +20,7 @@ The following parameter can be configured globally. It is applied to all the Ela
 ### Plugin presets
 Multiple presets can be configured in plugin settings to support multiple connections featuring different index templates. The following settings have to be configured in each configuration preset :
 * **Elasticsearch connections** : The name of the Elasticsearch connection(s) containing an Elasticsearch index template.. Multiple connections can be configured in a single preset.
+* **All columns** : ALL columns mappings of ALL managed datasets created using the Elasticsearch connections are defined in an Elasticsearch index template.
 * **Columns names** : Comma-separated list of column names defined in an Elasticsearch index template conflicting with DSS column mapping. 
 
 An Elasticsearch connection can only be defined in a single preset. An exception is triggered when a new dataset is created if the dataset connection is defined in more than one configuration preset

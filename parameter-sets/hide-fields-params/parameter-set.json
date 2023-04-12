@@ -15,7 +15,7 @@
             "label": "All columns",
             "type": "BOOLEAN",
             "defaultValue": false,
-            "description": "Elasticsearch mapping of ALL columns is defined in an index template."
+            "description": "ALL columns mappings of ALL managed datasets created using the Elasticsearch connections are defined in an Elasticsearch index template."
         },
         {
             "name": "columns",
